@@ -4,22 +4,26 @@ import { Star } from "lucide-react"
 
 const testimonials = [
   {
-    name: "Анна Петрова",
-    program: "Интенсивный английский, Лондон",
-    image: "/happy-female-student-testimonial-review.jpg",
+    name: "Эдуард",
+ 
+    image: "/review_1.jpeg",
     rating: 5,
+    review:
+      "Это были замечательные каникулы! Учителя просто космос!!! Каждый день школа проводит мероприятия и различные экскурсии. Также предоставляет скидки на платные экскурсии по Лондону и не только. Был приятно удивлен, когда директор школы с учительским составом во время урока зашли и поздравили меня с днём рождения.",
   },
   {
-    name: "Дмитрий Иванов",
-    program: "Work and Study, Дублин",
-    image: "/male-student-review-testimonial-smiling.jpg",
+    name: "Расул",
+    image: "/review_2.jpeg",
     rating: 5,
+    review:
+      "Я в восторге от поездки. Поехал с pre-intermediate и вернулся, как мне кажется, с intermediate. Школа была очень хорошая. Программы предлагали, и проблем ни с чем не возникало.",
   },
   {
-    name: "Елена Соколова",
-    program: "Общий английский, Лондон",
-    image: "/student-testimonial-review-card-positive.jpg",
+    name: "Елена",
+    image: "/review_3.jpeg",
     rating: 5,
+    review:
+      "Бронировала курс на неделю, также брала визовое сопровождение. Всё на высшем уровне! Обратная связь быстрая и оперативная. Очень много советов присылают на электронную почту. Сильно повысить уровень языка за неделю не получилось, но преодолеть языковой барьер — вполне. Отличная развлекательная программа от школы, есть скидки в музеи. Хочется сказать Linguatrip СПАСИБО за качественный сервис и незабываемую поездку!",
   },
 ]
 
@@ -59,9 +63,17 @@ export function Testimonials() {
                       ))}
                     </div>
                     <p className="text-sm font-semibold text-card-foreground">{testimonial.name}</p>
-                    <p className="text-xs text-muted-foreground">{testimonial.program}</p>
+                    {testimonial.program && (
+                      <p className="text-xs text-muted-foreground">{testimonial.program}</p>
+                    )}
                   </div>
                 </div>
+                {/* Review Text */}
+                {testimonial.review && (
+                  <div className="p-4">
+                    <p className="text-sm text-muted-foreground">{testimonial.review}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}

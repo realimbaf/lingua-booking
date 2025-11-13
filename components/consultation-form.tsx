@@ -13,11 +13,44 @@ import { MessageCircle, CheckCircle } from "lucide-react"
 
 export function ConsultationForm() {
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setIsSubmitted(true)
-    setTimeout(() => setIsSubmitted(false), 5000)
+    setError(null)
+    setIsSubmitting(true)
+    const form = e.currentTarget
+    try {
+      const fd = new FormData(form)
+      const payload = {
+        name: String(fd.get("name") || ""),
+        email: String(fd.get("email") || ""),
+        phone: String(fd.get("phone") || ""),
+        message: String(fd.get("message") || ""),
+      }
+
+      const res = await fetch("/api/consultation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        throw new Error(
+          data?.error || "Ошибка отправки. Попробуйте позже или напишите на hello@linguatrip.com.",
+        )
+      }
+
+      setIsSubmitted(true)
+      setTimeout(() => setIsSubmitted(false), 5000)
+      form.reset()
+    } catch (err: any) {
+      setError(err?.message || "Не удалось отправить заявку. Напишите на hello@linguatrip.com.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -50,12 +83,13 @@ export function ConsultationForm() {
                     <CheckCircle className="size-10" />
                   </div>
                   <div>
-                    <h3 className="mb-3 text-2xl font-bold">Отлично! Заявка отправлена! 🎉</h3>
-                    <p className="text-lg text-muted-foreground">Мы свяжемся с вами совсем скоро</p>
+                    <h3 className="mb-3 text-2xl font-bold">Спасибо за ваше обращение! 🎉</h3>
+                    <p className="text-lg text-muted-foreground">Мы скоро свяжемся с вами.</p>
                   </div>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {error && <p className="text-sm text-destructive">{error}</p>}
                   <div className="grid gap-6 sm:grid-cols-2">
                     <div className="space-y-3">
                       <Label htmlFor="name" className="text-base font-semibold">
@@ -63,6 +97,7 @@ export function ConsultationForm() {
                       </Label>
                       <Input
                         id="name"
+                        name="name"
                         placeholder="Ваше имя"
                         required
                         className="h-14 text-base border-2 focus:border-primary"
@@ -76,6 +111,7 @@ export function ConsultationForm() {
                       <Input
                         id="email"
                         type="email"
+                        name="email"
                         placeholder="your@email.com"
                         required
                         className="h-14 text-base border-2 focus:border-primary"
@@ -90,6 +126,7 @@ export function ConsultationForm() {
                     <Input
                       id="phone"
                       type="tel"
+                      name="phone"
                       placeholder="+7 (___) ___-__-__"
                       required
                       className="h-14 text-base border-2 focus:border-primary"
@@ -102,6 +139,7 @@ export function ConsultationForm() {
                     </Label>
                     <Textarea
                       id="message"
+                      name="message"
                       placeholder="Например: хочу улучшить разговорный английский для работы в IT..."
                       rows={5}
                       className="text-base border-2 focus:border-primary resize-none"
@@ -111,9 +149,10 @@ export function ConsultationForm() {
                   <Button
                     type="submit"
                     size="lg"
-                    className="w-full h-14 text-lg font-bold shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
+                    disabled={isSubmitting}
+                    className="w-full h-14 text-lg font-bold shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100"
                   >
-                    Получить консультацию 🚀
+                    {isSubmitting ? "Отправка..." : "Получить консультацию 🚀"}
                   </Button>
 
                   <p className="text-center text-sm text-muted-foreground leading-relaxed">
